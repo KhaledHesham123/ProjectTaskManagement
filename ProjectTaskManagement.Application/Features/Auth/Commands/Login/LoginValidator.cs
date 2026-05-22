@@ -1,0 +1,17 @@
+using FluentValidation;
+using ProjectTaskManagement.Application.Common.Validation;
+
+namespace ProjectTaskManagement.Application.Features.Auth.Commands.Login;
+
+public class LoginValidator : AbstractValidator<LoginCommand>
+{
+    public LoginValidator()
+    {
+        RuleFor(x => x.Email)
+            .NotEmpty().WithMessage(ValidationMessages.Required)
+            .EmailAddress().WithMessage(ValidationMessages.InvalidEmail);
+
+        RuleFor(x => x.Password)
+            .NotEmpty().WithMessage(ValidationMessages.Required);
+    }
+}

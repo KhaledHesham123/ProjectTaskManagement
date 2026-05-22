@@ -1,6 +1,49 @@
-@ProjectTaskManagement_HostAddress = http://localhost:5053
+@ProjectTaskManagement_HostAddress = https://localhost:7xxx
 
-GET {{ProjectTaskManagement_HostAddress}}/weatherforecast/
-Accept: application/json
+### Register
+POST {{ProjectTaskManagement_HostAddress}}/api/auth/register
+Content-Type: application/json
 
-###
+{
+  "userName": "jdoe",
+  "email": "jdoe@example.com",
+  "password": "Password1",
+  "firstName": "John",
+  "lastName": "Doe"
+}
+
+### Login
+POST {{ProjectTaskManagement_HostAddress}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "admin@projecttask.local",
+  "password": "Admin@12345"
+}
+
+### Create project
+POST {{ProjectTaskManagement_HostAddress}}/api/projects
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "name": "New Backend Project",
+  "description": "Clean Architecture implementation"
+}
+
+### Get projects
+GET {{ProjectTaskManagement_HostAddress}}/api/projects
+Authorization: Bearer {{accessToken}}
+
+### Create task
+POST {{ProjectTaskManagement_HostAddress}}/api/tasks
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "title": "Implement CQRS pipeline",
+  "description": "MediatR behaviors",
+  "priority": 2,
+  "projectId": "00000000-0000-0000-0000-000000000000",
+  "dueDate": "2026-06-01"
+}
