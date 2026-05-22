@@ -4,11 +4,8 @@ namespace ProjectTaskManagement.Application.Common.Interfaces;
 
 public interface ITokenService
 {
-    Task<AuthTokensDto> GenerateTokensAsync(
-        string userId,
-        string userName,
-        IEnumerable<string> roles,
-        IEnumerable<string> permissions,
+    Task<TokenDto> GenerateTokenAsync(
+        UserTokenProjection user,
         CancellationToken cancellationToken = default);
 
     Task<string?> ValidateRefreshTokenAsync(string refreshToken, CancellationToken cancellationToken = default);

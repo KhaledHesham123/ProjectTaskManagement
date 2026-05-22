@@ -2,62 +2,67 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using ProjectTaskManagement.Application.Common.Interfaces;
 using ProjectTaskManagement.Application.Features.Auth.Dtos;
-using ProjectTaskManagement.Domain.Entities.Identity;
-using ProjectTaskManagement.Infrastructure.Persistence;
+using ProjectTaskManagement.Domain.Entities.Auth;
 using ProjectTaskManagement.Infrastructure.Settings;
 
 namespace ProjectTaskManagement.Infrastructure.Services;
 
 public class TokenService(
     IOptions<JwtSettings> jwtOptions,
-    UserManager<ApplicationUser> userManager,
-    AppDbContext dbContext) : ITokenService
+    IGenericRepository<RefreshToken> refreshTokenRepository,
+    IUnitOfWork unitOfWork) : ITokenService
 {
     private readonly JwtSettings _settings = jwtOptions.Value;
 
-    public async Task<AuthTokensDto> GenerateTokensAsync(
-        string userId,
-        string userName,
-        IEnumerable<string> roles,
-        IEnumerable<string> permissions,
+    public async Task<TokenDto> GenerateTokenAsync(
+        UserTokenProjection user,
         CancellationToken cancellationToken = default)
     {
         var accessTokenExpires = DateTime.UtcNow.AddMinutes(_settings.AccessTokenExpirationMinutes);
         var refreshTokenExpires = DateTime.UtcNow.AddDays(_settings.RefreshTokenExpirationDays);
 
-        var refreshToken = GenerateRefreshToken();
-        var accessToken = CreateAccessToken(userId, userName, roles, permissions, accessTokenExpires);
+        var refreshTokenValue = GenerateRefreshToken();
+        var accessToken = CreateAccessToken(
+            user.Id,
+            user.UserName,
+            user.Roles,
+            user.Permissions,
+            accessTokenExpires);
 
-        var user = await userManager.FindByIdAsync(userId);
-        if (user is not null)
-        {
-            user.Refresh_Token = refreshToken;
-            user.Refresh_Token_Expires_At = refreshTokenExpires;
-            await userManager.UpdateAsync(user);
-        }
+        var existingTokens = await refreshTokenRepository
+            .GetByCriteriaQueryable(t => t.User_Id == user.Id)
+            .ToListAsync(cancellationToken);
 
-        return new AuthTokensDto(accessToken, refreshToken, accessTokenExpires, refreshTokenExpires);
+        foreach (var existingToken in existingTokens)
+            refreshTokenRepository.Delete(existingToken);
+
+        await refreshTokenRepository.AddAsync(
+            new RefreshToken
+            {
+                Id = Guid.NewGuid(),
+                Token = refreshTokenValue,
+                Expires_On = refreshTokenExpires,
+                User_Id = user.Id
+            },
+            cancellationToken);
+
+        await unitOfWork.SaveChangesAsync(cancellationToken);
+
+        return new TokenDto(accessToken, refreshTokenValue, accessTokenExpires, refreshTokenExpires);
     }
 
     public async Task<string?> ValidateRefreshTokenAsync(
         string refreshToken,
-        CancellationToken cancellationToken = default)
-    {
-        var user = await dbContext.Users
-            .FirstOrDefaultAsync(u =>
-                u.Refresh_Token == refreshToken &&
-                u.Refresh_Token_Expires_At > DateTime.UtcNow &&
-                !u.Is_Deleted,
-                cancellationToken);
-
-        return user?.Id;
-    }
+        CancellationToken cancellationToken = default) =>
+        await refreshTokenRepository
+            .GetByCriteriaQueryable(t => t.Token == refreshToken && t.Expires_On > DateTime.UtcNow)
+            .Select(t => t.User_Id)
+            .FirstOrDefaultAsync(cancellationToken);
 
     private string CreateAccessToken(
         string userId,
@@ -74,7 +79,7 @@ public class TokenService(
         };
 
         claims.AddRange(roles.Select(r => new Claim(ClaimTypes.Role, r)));
-        claims.AddRange(permissions.Select(p => new Claim("permission", p)));
+        claims.AddRange(permissions.Select(p => new Claim("Permission", p)));
 
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_settings.Secret));
         var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha512);

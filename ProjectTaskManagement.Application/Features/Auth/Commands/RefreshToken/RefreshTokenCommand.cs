@@ -1,6 +1,6 @@
-using MediatR;
 using ProjectTaskManagement.Application.Features.Auth.Dtos;
+using ProjectTaskManagement.Domain.Common;
 
 namespace ProjectTaskManagement.Application.Features.Auth.Commands.RefreshToken;
 
-public record RefreshTokenCommand(string RefreshToken) : IRequest<AuthTokensDto>;
+public record RefreshTokenCommand(string RefreshToken) : ICommand<Result<TokenDto>>;

@@ -7,9 +7,7 @@ Content-Type: application/json
 {
   "userName": "jdoe",
   "email": "jdoe@example.com",
-  "password": "Password1",
-  "firstName": "John",
-  "lastName": "Doe"
+  "password": "Password1"
 }
 
 ### Login
@@ -17,7 +15,7 @@ POST {{ProjectTaskManagement_HostAddress}}/api/auth/login
 Content-Type: application/json
 
 {
-  "email": "admin@projecttask.local",
+  "email": "Admin@Admin.com",
   "password": "Admin@12345"
 }
 
@@ -35,6 +33,24 @@ Content-Type: application/json
 GET {{ProjectTaskManagement_HostAddress}}/api/projects
 Authorization: Bearer {{accessToken}}
 
+### Get project by id
+GET {{ProjectTaskManagement_HostAddress}}/api/projects/00000000-0000-0000-0000-000000000000
+Authorization: Bearer {{accessToken}}
+
+### Update project
+PUT {{ProjectTaskManagement_HostAddress}}/api/projects/00000000-0000-0000-0000-000000000000
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "name": "Updated Project Name",
+  "description": "Updated description"
+}
+
+### Delete project
+DELETE {{ProjectTaskManagement_HostAddress}}/api/projects/00000000-0000-0000-0000-000000000000
+Authorization: Bearer {{accessToken}}
+
 ### Create task
 POST {{ProjectTaskManagement_HostAddress}}/api/tasks
 Authorization: Bearer {{accessToken}}
@@ -47,3 +63,20 @@ Content-Type: application/json
   "projectId": "00000000-0000-0000-0000-000000000000",
   "dueDate": "2026-06-01"
 }
+
+### Get tasks by project
+GET {{ProjectTaskManagement_HostAddress}}/api/tasks/project/00000000-0000-0000-0000-000000000000
+Authorization: Bearer {{accessToken}}
+
+### Update task status (0=Todo, 1=InProgress, 2=Review, 3=Done, 4=Cancelled)
+PATCH {{ProjectTaskManagement_HostAddress}}/api/tasks/00000000-0000-0000-0000-000000000000/status
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "status": 1
+}
+
+### Delete task
+DELETE {{ProjectTaskManagement_HostAddress}}/api/tasks/00000000-0000-0000-0000-000000000000
+Authorization: Bearer {{accessToken}}

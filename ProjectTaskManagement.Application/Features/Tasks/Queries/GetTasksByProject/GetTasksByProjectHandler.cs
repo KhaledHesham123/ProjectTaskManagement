@@ -1,23 +1,25 @@
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using ProjectTaskManagement.Application.Common.Interfaces;
 using ProjectTaskManagement.Application.Features.Tasks.Dtos;
+using ProjectTaskManagement.Domain.Common;
 using ProjectTaskManagement.Domain.Entities;
 
 namespace ProjectTaskManagement.Application.Features.Tasks.Queries.GetTasksByProject;
 
-public class GetTasksByProjectHandler(IUnitOfWork unitOfWork)
-    : IRequestHandler<GetTasksByProjectQuery, IReadOnlyList<TaskItemDto>>
+public class GetTasksByProjectHandler(IGenericRepository<TaskItem> taskRepository)
+    : IRequestHandler<GetTasksByProjectQuery, Result<IReadOnlyList<TaskItemDto>>>
 {
-    public async Task<IReadOnlyList<TaskItemDto>> Handle(
+    public async Task<Result<IReadOnlyList<TaskItemDto>>> Handle(
         GetTasksByProjectQuery request,
         CancellationToken cancellationToken)
     {
-        var tasks = await unitOfWork.Repository<TaskItem>().GetAllAsync(
-            t => t.ProjectId == request.ProjectId,
-            orderBy: q => q.OrderByDescending(t => t.DueDate),
-            cancellationToken: cancellationToken);
+        var tasks = await taskRepository
+            .GetByCriteriaQueryable(t => t.ProjectId == request.ProjectId)
+            .OrderByDescending(t => t.CreatedAt)
+            .ToListAsync(cancellationToken);
 
-        return tasks
+        var data = tasks
             .Select(t => new TaskItemDto(
                 t.Id,
                 t.Title,
@@ -27,5 +29,7 @@ public class GetTasksByProjectHandler(IUnitOfWork unitOfWork)
                 t.DueDate,
                 t.ProjectId))
             .ToList();
+
+        return Result<IReadOnlyList<TaskItemDto>>.Success(data);
     }
 }

@@ -2,7 +2,6 @@ namespace ProjectTaskManagement.Domain.Common;
 
 public static class ApplicationConstants
 {
-    public const string Programmer = "0EAEF81B-2E06-4404-9452-37AA39228D3F";
     public const string AdminId = "0EAEF81B-2E06-4404-9452-37AA39228D3E";
 
     public enum UserRole

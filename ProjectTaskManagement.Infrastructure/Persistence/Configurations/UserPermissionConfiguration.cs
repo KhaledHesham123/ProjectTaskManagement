@@ -12,5 +12,11 @@ public class UserPermissionConfiguration : IEntityTypeConfiguration<UserPermissi
         builder.HasKey(p => p.Id);
         builder.Property(p => p.Permission).IsRequired().HasMaxLength(200);
         builder.HasIndex(p => new { p.User_Id, p.Permission }).IsUnique();
+        builder.HasQueryFilter(p => !p.IsDeleted);
+
+        builder.HasOne(p => p.PermissionDefinition)
+            .WithMany()
+            .HasForeignKey(p => p.Permission)
+            .HasPrincipalKey(p => p.Name);
     }
 }

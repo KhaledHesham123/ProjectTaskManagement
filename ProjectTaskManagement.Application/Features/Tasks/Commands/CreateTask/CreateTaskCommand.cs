@@ -1,4 +1,3 @@
-using ProjectTaskManagement.Application.Features.Tasks.Dtos;
 using ProjectTaskManagement.Domain.Common;
 using ProjectTaskManagement.Domain.Enums;
 
@@ -9,4 +8,4 @@ public record CreateTaskCommand(
     string? Description,
     PriorityLevel Priority,
     DateTime? DueDate,
-    Guid ProjectId) : ICommand<TaskItemDto>;
+    Guid ProjectId) : ICommand<bool>;

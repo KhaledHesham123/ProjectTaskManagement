@@ -1,25 +1,29 @@
 using MediatR;
-using ProjectTaskManagement.Application.Common.Exceptions;
+using Microsoft.EntityFrameworkCore;
 using ProjectTaskManagement.Application.Common.Interfaces;
 using ProjectTaskManagement.Application.Features.Projects.Dtos;
+using ProjectTaskManagement.Domain.Common;
 using ProjectTaskManagement.Domain.Entities;
 
 namespace ProjectTaskManagement.Application.Features.Projects.Queries.GetProjectById;
 
-public class GetProjectByIdHandler(IUnitOfWork unitOfWork) : IRequestHandler<GetProjectByIdQuery, ProjectDto>
+public class GetProjectByIdHandler(IGenericRepository<Project> projectRepository)
+    : IRequestHandler<GetProjectByIdQuery, Result<ProjectDto>>
 {
-    public async Task<ProjectDto> Handle(GetProjectByIdQuery request, CancellationToken cancellationToken)
+    public async Task<Result<ProjectDto>> Handle(GetProjectByIdQuery request, CancellationToken cancellationToken)
     {
-        var project = await unitOfWork.Repository<Project>().FindAsync(
-            p => p.Id == request.Id,
-            asNoTracking: true,
-            cancellationToken: cancellationToken)
-            ?? throw new NotFoundException(nameof(Project), request.Id);
+        var project = await projectRepository
+            .GetByCriteriaQueryable(p => p.Id == request.Id)
+            .FirstOrDefaultAsync(cancellationToken);
 
-        return new ProjectDto(
-            project.Id,
-            project.Name,
-            project.Description,
-            project.CreatedAt);
+        if (project is null)
+            return Result<ProjectDto>.Fail("Project not found.");
+
+        return Result<ProjectDto>.Success(
+            new ProjectDto(
+                project.Id,
+                project.Name,
+                project.Description,
+                project.CreatedAt));
     }
 }

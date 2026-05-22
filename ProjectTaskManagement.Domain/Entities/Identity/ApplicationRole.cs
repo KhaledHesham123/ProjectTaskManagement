@@ -9,5 +9,4 @@ public class ApplicationRole : IdentityRole
     public bool Is_Deleted { get; set; }
 
     public ICollection<ApplicationUserRole> UserRoles { get; set; } = [];
-    public ICollection<RolePermission> RolePermissions { get; set; } = [];
 }

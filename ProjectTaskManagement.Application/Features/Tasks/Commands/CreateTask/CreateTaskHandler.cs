@@ -1,21 +1,23 @@
 using MediatR;
-using ProjectTaskManagement.Application.Common.Exceptions;
 using ProjectTaskManagement.Application.Common.Interfaces;
-using ProjectTaskManagement.Application.Features.Tasks.Dtos;
+using ProjectTaskManagement.Domain.Common;
 using ProjectTaskManagement.Domain.Entities;
 
 namespace ProjectTaskManagement.Application.Features.Tasks.Commands.CreateTask;
 
-public class CreateTaskHandler(IUnitOfWork unitOfWork) : IRequestHandler<CreateTaskCommand, TaskItemDto>
+public class CreateTaskHandler(
+    IGenericRepository<Project> projectRepository,
+    IGenericRepository<TaskItem> taskRepository,
+    IUnitOfWork unitOfWork) : IRequestHandler<CreateTaskCommand, bool>
 {
-    public async Task<TaskItemDto> Handle(CreateTaskCommand request, CancellationToken cancellationToken)
+    public async Task<bool> Handle(CreateTaskCommand request, CancellationToken cancellationToken)
     {
-        var projectExists = await unitOfWork.Repository<Project>().IsExistsAsync(
+        var projectExists = await projectRepository.AnyAsync(
             p => p.Id == request.ProjectId,
             cancellationToken);
 
         if (!projectExists)
-            throw new NotFoundException(nameof(Project), request.ProjectId);
+            return false;
 
         var task = new TaskItem
         {
@@ -27,16 +29,9 @@ public class CreateTaskHandler(IUnitOfWork unitOfWork) : IRequestHandler<CreateT
             ProjectId = request.ProjectId
         };
 
-        await unitOfWork.Repository<TaskItem>().AddAsync(task, cancellationToken);
+        await taskRepository.AddAsync(task, cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);
 
-        return new TaskItemDto(
-            task.Id,
-            task.Title,
-            task.Description,
-            task.Status,
-            task.Priority,
-            task.DueDate,
-            task.ProjectId);
+        return true;
     }
 }

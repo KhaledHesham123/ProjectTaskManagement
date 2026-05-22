@@ -10,10 +10,5 @@ public class ApplicationRoleConfiguration : IEntityTypeConfiguration<Application
     {
         builder.Property(r => r.Description).HasMaxLength(500);
         builder.HasQueryFilter(r => !r.Is_Deleted);
-
-        builder.HasMany(r => r.RolePermissions)
-            .WithOne(p => p.Role)
-            .HasForeignKey(p => p.Role_Id)
-            .OnDelete(DeleteBehavior.Cascade);
     }
 }

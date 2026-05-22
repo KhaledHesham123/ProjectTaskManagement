@@ -1,5 +1,4 @@
 using FluentValidation;
-using ProjectTaskManagement.Application.Common.Validation;
 
 namespace ProjectTaskManagement.Application.Features.Projects.Commands.CreateProject;
 
@@ -8,10 +7,10 @@ public class CreateProjectValidator : AbstractValidator<CreateProjectCommand>
     public CreateProjectValidator()
     {
         RuleFor(x => x.Name)
-            .NotEmpty().WithMessage(ValidationMessages.Required)
-            .MaximumLength(200).WithMessage(ValidationMessages.MaxLength);
+            .NotEmpty().WithMessage("Name is required.")
+            .MaximumLength(200).WithMessage("Name must not exceed 200 characters.");
 
         RuleFor(x => x.Description)
-            .MaximumLength(2000).WithMessage(ValidationMessages.MaxLength);
+            .MaximumLength(2000).WithMessage("Description must not exceed 2000 characters.");
     }
 }

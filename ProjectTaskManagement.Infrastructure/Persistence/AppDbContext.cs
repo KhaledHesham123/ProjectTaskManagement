@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using ProjectTaskManagement.Application.Common.Interfaces;
 using ProjectTaskManagement.Domain.Common;
 using ProjectTaskManagement.Domain.Entities;
+using ProjectTaskManagement.Domain.Entities.Auth;
 using ProjectTaskManagement.Domain.Entities.Identity;
 
 namespace ProjectTaskManagement.Infrastructure.Persistence;
@@ -16,7 +17,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options, ICurrentUserSe
     public DbSet<TaskItem> Tasks => Set<TaskItem>();
     public DbSet<Permission> Permissions => Set<Permission>();
     public DbSet<UserPermission> UserPermissions => Set<UserPermission>();
-    public DbSet<RolePermission> RolePermissions => Set<RolePermission>();
+    public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
