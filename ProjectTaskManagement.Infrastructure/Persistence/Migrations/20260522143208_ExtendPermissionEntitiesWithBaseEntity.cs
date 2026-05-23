@@ -5,8 +5,10 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace ProjectTaskManagement.Infrastructure.Persistence.Migrations
 {
+    /// <inheritdoc />
     public partial class ExtendPermissionEntitiesWithBaseEntity : Migration
     {
+        /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AddColumn<DateTime>(
@@ -74,6 +76,7 @@ namespace ProjectTaskManagement.Infrastructure.Persistence.Migrations
                 nullable: true);
         }
 
+        /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropColumn(

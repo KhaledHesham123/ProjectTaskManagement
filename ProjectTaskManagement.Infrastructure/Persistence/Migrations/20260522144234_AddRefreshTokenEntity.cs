@@ -5,8 +5,10 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace ProjectTaskManagement.Infrastructure.Persistence.Migrations
 {
+    /// <inheritdoc />
     public partial class AddRefreshTokenEntity : Migration
     {
+        /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropColumn(
@@ -58,6 +60,7 @@ namespace ProjectTaskManagement.Infrastructure.Persistence.Migrations
                 column: "User_Id");
         }
 
+        /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
