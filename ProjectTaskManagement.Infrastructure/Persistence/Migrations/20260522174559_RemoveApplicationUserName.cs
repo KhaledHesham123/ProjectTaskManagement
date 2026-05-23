@@ -4,10 +4,8 @@
 
 namespace ProjectTaskManagement.Infrastructure.Persistence.Migrations
 {
-    /// <inheritdoc />
     public partial class RemoveApplicationUserName : Migration
     {
-        /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropColumn(
@@ -15,7 +13,6 @@ namespace ProjectTaskManagement.Infrastructure.Persistence.Migrations
                 table: "AspNetUsers");
         }
 
-        /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AddColumn<string>(

@@ -4,10 +4,8 @@
 
 namespace ProjectTaskManagement.Infrastructure.Persistence.Migrations
 {
-    /// <inheritdoc />
     public partial class ReplaceUserNameFieldsWithName : Migration
     {
-        /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropColumn(
@@ -42,7 +40,6 @@ namespace ProjectTaskManagement.Infrastructure.Persistence.Migrations
                 onDelete: ReferentialAction.Cascade);
         }
 
-        /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropForeignKey(

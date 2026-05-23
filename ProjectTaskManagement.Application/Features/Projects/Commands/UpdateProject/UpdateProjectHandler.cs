@@ -11,7 +11,9 @@ public class UpdateProjectHandler(
     IGenericRepository<Project> projectRepository,
     IUnitOfWork unitOfWork) : IRequestHandler<UpdateProjectCommand, Result<ProjectDto>>
 {
-    public async Task<Result<ProjectDto>> Handle(UpdateProjectCommand request, CancellationToken cancellationToken)
+    public async Task<Result<ProjectDto>> Handle(
+        UpdateProjectCommand request,
+        CancellationToken cancellationToken)
     {
         var project = await projectRepository
             .GetByCriteriaQueryable(p => p.Id == request.Id)

@@ -1,14 +1,12 @@
-using System;
+﻿using System;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
 namespace ProjectTaskManagement.Infrastructure.Persistence.Migrations
 {
-    /// <inheritdoc />
     public partial class AddPermissionsAndSeedUsers : Migration
     {
-        /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AddColumn<string>(
@@ -45,7 +43,6 @@ namespace ProjectTaskManagement.Infrastructure.Persistence.Migrations
                 });
         }
 
-        /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(

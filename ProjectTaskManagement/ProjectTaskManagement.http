@@ -1,4 +1,4 @@
-@ProjectTaskManagement_HostAddress = https://localhost:7xxx
+﻿@ProjectTaskManagement_HostAddress = https://localhost:7xxx
 
 ### Register
 POST {{ProjectTaskManagement_HostAddress}}/api/auth/register
@@ -68,7 +68,7 @@ Content-Type: application/json
 GET {{ProjectTaskManagement_HostAddress}}/api/tasks/project/00000000-0000-0000-0000-000000000000
 Authorization: Bearer {{accessToken}}
 
-### Update task status (0=Todo, 1=InProgress, 2=Review, 3=Done, 4=Cancelled)
+### Update task status
 PATCH {{ProjectTaskManagement_HostAddress}}/api/tasks/00000000-0000-0000-0000-000000000000/status
 Authorization: Bearer {{accessToken}}
 Content-Type: application/json

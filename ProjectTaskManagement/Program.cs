@@ -1,4 +1,5 @@
 using System.Reflection;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.OpenApi.Models;
 using ProjectTaskManagement.Application;
 using ProjectTaskManagement.Infrastructure;
@@ -52,6 +53,8 @@ builder.Services.AddSwaggerGen(options =>
 
 builder.Services.AddApplication();
 builder.Services.AddInfrastructure(builder.Configuration);
+
+builder.Services.AddSingleton<IAuthorizationMiddlewareResultHandler, ForbiddenAuthorizationMiddlewareResultHandler>();
 
 var app = builder.Build();
 

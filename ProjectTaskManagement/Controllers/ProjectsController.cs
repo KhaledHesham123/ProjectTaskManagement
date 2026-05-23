@@ -5,7 +5,6 @@ using ProjectTaskManagement.Application.Features.Projects.Commands.DeleteProject
 using ProjectTaskManagement.Application.Features.Projects.Commands.UpdateProject;
 using ProjectTaskManagement.Application.Features.Projects.Queries.GetProjectById;
 using ProjectTaskManagement.Application.Features.Projects.Queries.GetProjects;
-using ProjectTaskManagement.Extensions;
 using ProjectTaskManagement.Infrastructure.DynamicRBASystem;
 using static ProjectTaskManagement.Domain.Common.ApplicationConstants;
 
@@ -19,8 +18,8 @@ public class ProjectsController(ISender sender) : ControllerBase
     [HasPermission(AppPermissions.Create)]
     public async Task<IActionResult> Create([FromBody] CreateProjectCommand command, CancellationToken cancellationToken)
     {
-        var succeeded = await sender.Send(command, cancellationToken);
-        return succeeded ? Ok(true) : BadRequest(false);
+        var result = await sender.Send(command, cancellationToken);
+        return result.Succeeded ? Ok(result) : BadRequest(result);
     }
 
     [HttpGet("GetAll")]
@@ -28,7 +27,7 @@ public class ProjectsController(ISender sender) : ControllerBase
     public async Task<IActionResult> GetAll(CancellationToken cancellationToken)
     {
         var result = await sender.Send(new GetProjectsQuery(), cancellationToken);
-        return result.ToActionResult();
+        return result.Succeeded ? Ok(result) : BadRequest(result);
     }
 
     [HttpGet("GetById")]
@@ -36,7 +35,7 @@ public class ProjectsController(ISender sender) : ControllerBase
     public async Task<IActionResult> GetById(Guid id, CancellationToken cancellationToken)
     {
         var result = await sender.Send(new GetProjectByIdQuery(id), cancellationToken);
-        return result.ToActionResult();
+        return result.Succeeded ? Ok(result) : BadRequest(result);
     }
 
     [HttpPut]
@@ -50,7 +49,7 @@ public class ProjectsController(ISender sender) : ControllerBase
             new UpdateProjectCommand(id, request.Name, request.Description),
             cancellationToken);
 
-        return result.ToActionResult();
+        return result.Succeeded ? Ok(result) : BadRequest(result);
     }
 
     [HttpDelete]
@@ -58,7 +57,7 @@ public class ProjectsController(ISender sender) : ControllerBase
     public async Task<IActionResult> Delete(Guid id, CancellationToken cancellationToken)
     {
         var result = await sender.Send(new DeleteProjectCommand(id), cancellationToken);
-        return result.ToActionResult();
+        return result.Succeeded ? Ok(result) : BadRequest(result);
     }
 }
 

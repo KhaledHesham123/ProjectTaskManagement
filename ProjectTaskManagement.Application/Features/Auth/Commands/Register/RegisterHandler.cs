@@ -12,7 +12,9 @@ public class RegisterHandler(
     IGenericRepository<UserPermission> userPermissionRepository,
     IUnitOfWork unitOfWork) : IRequestHandler<RegisterCommand, Result<bool>>
 {
-    public async Task<Result<bool>> Handle(RegisterCommand request, CancellationToken cancellationToken)
+    public async Task<Result<bool>> Handle(
+        RegisterCommand request,
+        CancellationToken cancellationToken)
     {
         var existingByEmail = await userManager.FindByEmailAsync(request.Email);
         var existingByUserName = await userManager.FindByNameAsync(request.UserName);

@@ -10,7 +10,9 @@ public class DeleteProjectHandler(
     IGenericRepository<Project> projectRepository,
     IUnitOfWork unitOfWork) : IRequestHandler<DeleteProjectCommand, Result<bool>>
 {
-    public async Task<Result<bool>> Handle(DeleteProjectCommand request, CancellationToken cancellationToken)
+    public async Task<Result<bool>> Handle(
+        DeleteProjectCommand request,
+        CancellationToken cancellationToken)
     {
         var project = await projectRepository
             .GetByCriteriaQueryable(p => p.Id == request.Id)

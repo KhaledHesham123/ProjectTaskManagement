@@ -5,17 +5,14 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace ProjectTaskManagement.Infrastructure.Persistence.Migrations
 {
-    /// <inheritdoc />
     public partial class RemoveRolePermissions : Migration
     {
-        /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
                 name: "RolePermissions");
         }
 
-        /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(

@@ -1,14 +1,18 @@
 using MediatR;
 using ProjectTaskManagement.Application.Common.Interfaces;
+using ProjectTaskManagement.Application.Features.Projects.Dtos;
+using ProjectTaskManagement.Domain.Common;
 using ProjectTaskManagement.Domain.Entities;
 
 namespace ProjectTaskManagement.Application.Features.Projects.Commands.CreateProject;
 
 public class CreateProjectHandler(
     IGenericRepository<Project> projectRepository,
-    IUnitOfWork unitOfWork) : IRequestHandler<CreateProjectCommand, bool>
+    IUnitOfWork unitOfWork) : IRequestHandler<CreateProjectCommand, Result<ProjectDto>>
 {
-    public async Task<bool> Handle(CreateProjectCommand request, CancellationToken cancellationToken)
+    public async Task<Result<ProjectDto>> Handle(
+        CreateProjectCommand request,
+        CancellationToken cancellationToken)
     {
         var project = new Project
         {
@@ -18,9 +22,13 @@ public class CreateProjectHandler(
         };
 
         await projectRepository.AddAsync(project, cancellationToken);
-
         await unitOfWork.SaveChangesAsync(cancellationToken);
 
-        return true;
+        return Result<ProjectDto>.Success(
+            new ProjectDto(
+                project.Id,
+                project.Name,
+                project.Description,
+                project.CreatedAt));
     }
 }

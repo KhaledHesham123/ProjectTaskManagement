@@ -1,5 +1,6 @@
 using MediatR;
 using ProjectTaskManagement.Application.Common.Interfaces;
+using ProjectTaskManagement.Application.Features.Tasks.Dtos;
 using ProjectTaskManagement.Domain.Common;
 using ProjectTaskManagement.Domain.Entities;
 
@@ -8,16 +9,18 @@ namespace ProjectTaskManagement.Application.Features.Tasks.Commands.CreateTask;
 public class CreateTaskHandler(
     IGenericRepository<Project> projectRepository,
     IGenericRepository<TaskItem> taskRepository,
-    IUnitOfWork unitOfWork) : IRequestHandler<CreateTaskCommand, bool>
+    IUnitOfWork unitOfWork) : IRequestHandler<CreateTaskCommand, Result<TaskItemDto>>
 {
-    public async Task<bool> Handle(CreateTaskCommand request, CancellationToken cancellationToken)
+    public async Task<Result<TaskItemDto>> Handle(
+        CreateTaskCommand request,
+        CancellationToken cancellationToken)
     {
         var projectExists = await projectRepository.AnyAsync(
             p => p.Id == request.ProjectId,
             cancellationToken);
 
         if (!projectExists)
-            return false;
+            return Result<TaskItemDto>.Fail("Project not found.");
 
         var task = new TaskItem
         {
@@ -32,6 +35,14 @@ public class CreateTaskHandler(
         await taskRepository.AddAsync(task, cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);
 
-        return true;
+        return Result<TaskItemDto>.Success(
+            new TaskItemDto(
+                task.Id,
+                task.Title,
+                task.Description,
+                task.Status,
+                task.Priority,
+                task.DueDate,
+                task.ProjectId));
     }
 }
