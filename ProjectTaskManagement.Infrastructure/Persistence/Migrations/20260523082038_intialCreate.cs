@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace ProjectTaskManagement.Infrastructure.Persistence.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class intialCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -33,15 +33,13 @@ namespace ProjectTaskManagement.Infrastructure.Persistence.Migrations
                 columns: table => new
                 {
                     Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    First_Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
-                    Last_Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
+                    JobTitle = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
+                    Is_Active = table.Column<bool>(type: "bit", nullable: false),
                     Created_At = table.Column<DateTime>(type: "datetime2", nullable: false),
                     Created_By = table.Column<string>(type: "nvarchar(450)", maxLength: 450, nullable: true),
                     Modified_At = table.Column<DateTime>(type: "datetime2", nullable: true),
                     Modified_By = table.Column<string>(type: "nvarchar(450)", maxLength: 450, nullable: true),
                     Is_Deleted = table.Column<bool>(type: "bit", nullable: false),
-                    Refresh_Token = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
-                    Refresh_Token_Expires_At = table.Column<DateTime>(type: "datetime2", nullable: true),
                     UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
@@ -63,20 +61,30 @@ namespace ProjectTaskManagement.Infrastructure.Persistence.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Permissions",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Permissions", x => x.Id);
+                    table.UniqueConstraint("AK_Permissions_Name", x => x.Name);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Projects",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Name = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
                     Description = table.Column<string>(type: "nvarchar(2000)", maxLength: 2000, nullable: true),
-                    Start_Date = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    End_Date = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    Owner_User_Id = table.Column<string>(type: "nvarchar(450)", maxLength: 450, nullable: true),
-                    Created_At = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Created_By = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Modified_At = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    Modified_By = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Is_Deleted = table.Column<bool>(type: "bit", nullable: false)
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ModifiedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    ModifiedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -99,25 +107,6 @@ namespace ProjectTaskManagement.Infrastructure.Persistence.Migrations
                     table.ForeignKey(
                         name: "FK_AspNetRoleClaims_AspNetRoles_RoleId",
                         column: x => x.RoleId,
-                        principalTable: "AspNetRoles",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "RolePermissions",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Role_Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    Permission = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_RolePermissions", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_RolePermissions_AspNetRoles_Role_Id",
-                        column: x => x.Role_Id,
                         principalTable: "AspNetRoles",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -209,12 +198,42 @@ namespace ProjectTaskManagement.Infrastructure.Persistence.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "RefreshTokens",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Token = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: false),
+                    Expires_On = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    User_Id = table.Column<string>(type: "nvarchar(450)", maxLength: 450, nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ModifiedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    ModifiedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_RefreshTokens", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_RefreshTokens_AspNetUsers_User_Id",
+                        column: x => x.User_Id,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "UserPermissions",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     User_Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    Permission = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false)
+                    Permission = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ModifiedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    ModifiedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -224,6 +243,12 @@ namespace ProjectTaskManagement.Infrastructure.Persistence.Migrations
                         column: x => x.User_Id,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_UserPermissions_Permissions_Permission",
+                        column: x => x.Permission,
+                        principalTable: "Permissions",
+                        principalColumn: "Name",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -236,21 +261,20 @@ namespace ProjectTaskManagement.Infrastructure.Persistence.Migrations
                     Description = table.Column<string>(type: "nvarchar(4000)", maxLength: 4000, nullable: true),
                     Status = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
                     Priority = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    Due_Date = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    Project_Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Assigned_To_User_Id = table.Column<string>(type: "nvarchar(450)", maxLength: 450, nullable: true),
-                    Created_At = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Created_By = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Modified_At = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    Modified_By = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Is_Deleted = table.Column<bool>(type: "bit", nullable: false)
+                    DueDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    ProjectId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ModifiedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    ModifiedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Tasks", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Tasks_Projects_Project_Id",
-                        column: x => x.Project_Id,
+                        name: "FK_Tasks_Projects_ProjectId",
+                        column: x => x.ProjectId,
                         principalTable: "Projects",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -296,15 +320,25 @@ namespace ProjectTaskManagement.Infrastructure.Persistence.Migrations
                 filter: "[NormalizedUserName] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
-                name: "IX_RolePermissions_Role_Id_Permission",
-                table: "RolePermissions",
-                columns: new[] { "Role_Id", "Permission" },
+                name: "IX_RefreshTokens_Token",
+                table: "RefreshTokens",
+                column: "Token",
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_Tasks_Project_Id",
+                name: "IX_RefreshTokens_User_Id",
+                table: "RefreshTokens",
+                column: "User_Id");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Tasks_ProjectId",
                 table: "Tasks",
-                column: "Project_Id");
+                column: "ProjectId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_UserPermissions_Permission",
+                table: "UserPermissions",
+                column: "Permission");
 
             migrationBuilder.CreateIndex(
                 name: "IX_UserPermissions_User_Id_Permission",
@@ -332,7 +366,7 @@ namespace ProjectTaskManagement.Infrastructure.Persistence.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
-                name: "RolePermissions");
+                name: "RefreshTokens");
 
             migrationBuilder.DropTable(
                 name: "Tasks");
@@ -348,6 +382,9 @@ namespace ProjectTaskManagement.Infrastructure.Persistence.Migrations
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");
+
+            migrationBuilder.DropTable(
+                name: "Permissions");
         }
     }
 }
