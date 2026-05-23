@@ -1,6 +1,6 @@
+using MediatR;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using ProjectTaskManagement.Application.Common.Handlers;
 using ProjectTaskManagement.Application.Common.Interfaces;
 using ProjectTaskManagement.Application.Features.Auth.Dtos;
 using ProjectTaskManagement.Domain.Common;
@@ -11,9 +11,9 @@ namespace ProjectTaskManagement.Application.Features.Auth.Commands.Login;
 public class LoginCommandHandler(
     UserManager<ApplicationUser> userManager,
     ITokenService tokenService)
-    : BaseHandler<LoginCommand, Result<TokenDto>>
+    : IRequestHandler<LoginCommand, Result<TokenDto>>
 {
-    public override async Task<Result<TokenDto>> Handle(
+    public async Task<Result<TokenDto>> Handle(
         LoginCommand request,
         CancellationToken cancellationToken)
     {
