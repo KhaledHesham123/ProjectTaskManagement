@@ -19,6 +19,11 @@ This system implements an advanced **Permission-Based Authorization** coupled wi
 | **Email** | `Admin@Admin.com` |
 | **Password** | `P00000` |
 
+### 3. ⚠️ Swagger Authorization Configuration (Paste Token ONLY)
+The Swagger UI is already configured in the code to automatically append the `Bearer ` prefix to your token. 
+* **When authorizing in Swagger:** Click the **Authorize** button, and paste **ONLY the raw token string** into the input box. 
+* ❌ **DO NOT** type the word `Bearer` before it, or your requests will fail with a `401 Unauthorized` error due to duplication.
+
 ---
 
 ## 🛠️ Project Deliverables & Scope Commitment
@@ -64,4 +69,4 @@ Separation of concerns between Read and Write operations using **MediatR**. This
 5. **Authorize:** 
    * Call the login endpoint with the Admin credentials listed in the critical notes section above.
    * Copy the generated `accessToken` from the response.
-   * Click the **Authorize** button at the top of the Swagger page, paste the token, and unlock all endpoints for testing.
+   * Click the **Authorize** button at the top of the Swagger page, paste the **raw token only** (without typing Bearer), and unlock all endpoints for testing.
